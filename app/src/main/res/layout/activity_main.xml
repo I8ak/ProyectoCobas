@@ -6,6 +6,17 @@
     android:gravity="center"
     android:padding="16dp">
 
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="59dp"
+        android:hint="Escribe tu nombre"
+        android:inputType="text" />
+    <Button
+        android:id="@+id/miBoton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enviar" />
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -13,4 +24,5 @@
         android:text="Esperando mensaje del servidor..."
         android:textSize="18sp"
         android:textAlignment="center"/>
+
 </LinearLayout>
