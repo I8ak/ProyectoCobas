@@ -18,9 +18,6 @@
             android:name=".Lista"
             android:exported="false" />
         <activity
-            android:name=".ComidaLista"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
