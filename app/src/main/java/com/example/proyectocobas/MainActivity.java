@@ -6,6 +6,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,9 +30,20 @@ public class MainActivity extends AppCompatActivity {
         Button miBoton = findViewById(R.id.miBoton);
         miBoton.setOnClickListener(v ->{
             String mensaje = editText.getText().toString().trim();
-            if (!mensaje.isEmpty()) {
-                new Lanzar(mensaje).start();
+            JSONObject json=new JSONObject();
+            char VT = 11;   // \x0B
+            char FS = 28;   // \x1C (File Separator)
+            char CR = 13;
+            String mensjaeNuevo=mensaje;
+            try {
 
+                json.put("name",mensjaeNuevo);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            if (!mensaje.isEmpty()) {
+
+                new Lanzar(VT+json.toString()+FS+CR).start();
             }else {
                 textView.setText("Escribe algo");
             }
@@ -42,25 +57,36 @@ public class MainActivity extends AppCompatActivity {
         }
         @Override
         public void run() {
-            String ip = "10.35.50.32"; // Cambia esto si usas un dispositivo físico
+            String ip = "10.35.50.32";
             int puerto = 33333;
             String respuesta = "";
-
+            String valorRespuesta="";
             try (Socket socket = new Socket(ip, puerto);
                  PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
                 out.println(mensaje);
                 respuesta = in.readLine();
+                respuesta = respuesta.replaceAll("[\\u000B\\u001C\\u000D]", "").trim();
+
+                // Verificar si es JSON
+                if (respuesta.startsWith("{") && respuesta.endsWith("}")) {
+                    JSONObject jsonRespuesta = new JSONObject(respuesta);
+                    valorRespuesta = jsonRespuesta.getString("repuesta");
+                } else {
+                    valorRespuesta = respuesta;
+                }
+
 
             } catch (IOException e) {
-                respuesta = "Error: " + e.getMessage();
+                valorRespuesta = "Error: " + e.getMessage();
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
 
-            // Actualizar la UI correctamente
-            final String finalRespuesta = respuesta;
+            final String finalRespuesta =valorRespuesta ;
             runOnUiThread(() -> textView.setText(finalRespuesta));
-            if (finalRespuesta.equals("Acceso Exitoso")){
+            if (finalRespuesta.equals("esta es mi respuesta")){
                 Intent intent=new Intent(MainActivity.this,Lista.class);
                 startActivity(intent);
             }
